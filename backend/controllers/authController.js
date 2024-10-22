@@ -10,7 +10,7 @@ const authController = {
           const salt = await bcrypt.genSalt(10);
           const hashedPassword = await bcrypt.hash(req.body.password, salt);
     
-          const newUser = await new User({
+          const newUser = new User({
             username: req.body.username,
             email: req.body.email,
             password: hashedPassword,
@@ -32,7 +32,7 @@ const authController = {
                 admin: user.admin
             }, 
             process.env.SECRET_KEY,
-            { expiresIn: "120s" }
+            { expiresIn: "180s" }
         );
     },
 
@@ -52,9 +52,9 @@ const authController = {
     //LOGIN USER
     loginUser: async(req, res) => {
         try{
-            const user = await User.findOne({username: req.body.username});
+            const user = await User.findOne({where: {username: req.body.username}});
             if(!user){
-                res.status(400).json("Wrong username");
+                res.status(404).json("Wrong username");
             }
 
             const validPassword = await bcrypt.compare(
@@ -73,7 +73,7 @@ const authController = {
                     httpOnly: true,
                     secure: false,
                     path:"/",
-                    samesite: "Strict",
+                    sameSite: "strict",
                 });
 
                 //Ẩn mật khẩu
@@ -97,7 +97,7 @@ const authController = {
             if(err){
                 console.log(err);
             }
-            refreshTokens = refreshToken.filter((token) => token !== refreshToken);
+            refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
 
             //tao moi accesstoken va refreshtoken
             const newAccessToken = authController.generateAccessToken(user);
@@ -107,19 +107,20 @@ const authController = {
                 httpOnly: true,
                 secure: false,
                 path:"/",
-                samesite: "Strict",
+                sameSite: "strict",
             });
 
-            res.status(200).json({accessToken: newAccessToken});
+            res.status(200).json({accessToken: newAccessToken, refreshToken: newRefreshToken});
         });
     },
 
     //logout user
     userLogout: async(req, res) => {
+        refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
         res.clearCookie("refreshToken");
-        refreshTokens = refreshTokens.filter((token) => token !== req.cookies.refreshToken);
-        res.status(200).json("Logut success");
-    }
+        res.status(200).json("Logged out successfully!");
+    },
+    
 };
   
 

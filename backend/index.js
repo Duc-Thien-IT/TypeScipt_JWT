@@ -1,8 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-const pool = require("./config/db");
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocs = require('./swaggerOptions');
+const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const path = require("path");
@@ -14,6 +15,9 @@ const app = express();
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
+
+//swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Serve static files from the frontend directory
 app.use(express.static(path.join(__dirname, '..', 'frontend')));

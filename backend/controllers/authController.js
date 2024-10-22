@@ -88,14 +88,15 @@ const authController = {
     },
 
     requestRefreshToken: async(req, res) => {
-        const refreshToken = req.cookie.refreshToken;
+        const refreshToken = req.cookies.refreshToken;
         if(!refreshToken) return res.status(401).json("You aren't authenticated");
         if(refreshTokens.includes(refreshToken)){
             return res.status(403).json("Refresh token is not valid");
-        }
+        }   
         jwt.verify(refreshToken, process.env.REFRESH_KEY, (err, user) => {
             if(err){
                 console.log(err);
+                return res.status(403).json("Invalid refresh token");
             }
             refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
 

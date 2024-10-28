@@ -62,5 +62,41 @@ router.post("/register", authController.registerUser);
  */
 router.post("/login", authController.loginUser);
 
+/**
+ * @swagger
+ * /v1/auth/verify-otp:
+ *   post:
+ *     summary: Verify OTP
+ *     description: Verify the OTP sent to the user's email.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               otp:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: OTP verification failed
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/verify-otp", authController.verifyOtp);
+
+router.post("/resend-otp", authController.resendOtp);
 
 module.exports = router;
